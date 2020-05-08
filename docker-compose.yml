@@ -1,0 +1,18 @@
+version: '3'
+
+services: 
+  reverse-proxy:
+    image: traefik:v2.2
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "5001:80"
+      - "5000:8080"
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+  whoami:
+    image: containous/whoami
+    labels: 
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+      - "traefik.http.middlewares.whoami.ratelimit=10"
+      - "traefik.http.middlewares.whoami.burst=5"
+      - "traefik.http.middlewares.whoami.period=10s"
